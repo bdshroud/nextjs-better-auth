@@ -1,4 +1,5 @@
 "use client";
+
 import { signUp } from "@/lib/auth-client";
 import { Button, Description, FieldError, Form, Input, Label, TextField } from "@heroui/react";
 
