@@ -3,32 +3,44 @@
 import { signIn } from "@/lib/auth-client";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { Button, Description, FieldError, Form, Input, InputGroup, Label, TextField } from "@heroui/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
 const SignInPage = () => {
+    const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (e) => {
         e.preventDefault();
+        setErrorMsg("");
+        setIsLoading(true);
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
-        console.log('form er data', data)
 
         const { data: resData, error } = await signIn.email({
             email: data.email,
             password: data.password,
             rememberMe: true,
-            callbackURL: '/'
+            callbackURL: '/dashboard'
         })
+        
+        setIsLoading(false);
 
-        console.log('after submit', resData, error);
+        if (error) {
+            setErrorMsg(error.message || "Invalid email or password");
+        } else {
+            router.push("/dashboard");
+        }
 
     };
 
     return (
         <div>
             <h2>Please Sign in</h2>
+            {errorMsg && <div className="text-red-500 mb-4">{errorMsg}</div>}
             <Form className="flex w-96 flex-col gap-4" onSubmit={onSubmit}>
                 <TextField
                     isRequired
@@ -85,11 +97,10 @@ const SignInPage = () => {
                 </TextField>
                
                 <div className="flex gap-2">
-                    <Button type="submit">
-                        {/* <Check /> */}
+                    <Button type="submit" isLoading={isLoading}>
                         Submit
                     </Button>
-                    <Button type="reset" variant="secondary">
+                    <Button type="reset" variant="secondary" onPress={() => setErrorMsg("")}>
                         Reset
                     </Button>
                 </div>

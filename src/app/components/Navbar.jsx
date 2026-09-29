@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, Button, Spinner } from "@heroui/react";
 import { signOut, useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,7 +23,7 @@ export default function Navbar() {
             <Link href="#">Features</Link>
         </li>
         <li>
-            <Link href="#" className="font-medium text-accent" aria-current="page">
+            <Link href="/dashboard" className="font-medium text-accent" aria-current="page">
                 Dashboard
             </Link>
         </li>
@@ -31,11 +32,16 @@ export default function Navbar() {
         </li>
     </>
 
+    const router = useRouter();
+
     const authLinks = <>
         {
             session?.user ? <>
                 <span>Welcome, {session.user?.name}</span>
-                <Button onClick={() => signOut()}>Sign Out</Button>
+                <Button onPress={async () => {
+                    await signOut();
+                    router.push("/sign-in");
+                }}>Sign Out</Button>
             </> : <>
                 <Link href="/sign-in">Sign in</Link>
                 <Link href="/sign-up"><Button>Sign Up</Button></Link>
